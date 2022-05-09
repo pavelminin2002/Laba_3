@@ -16,6 +16,7 @@ class Board {
     fun registerListener(listener: BoardListener) {
         this.listener = listener
     }
+
     init {
         for (row in 0 until width) {
             val list = mutableListOf<Cell>()
@@ -46,13 +47,13 @@ class Board {
     }
 
     fun makeTurn(cell: Cell) {
-        var oneWay:Boolean
+        var oneWay: Boolean
         clearBoard()
         val x = if (turn == ChipColor.WHITE) -1 else 1
         if (turn == cell.chip?.color) {
             checkEatAll()
+            cells[cell.x][cell.y].color = CellColor.YELLOW
             if (!(readyEat.isNotEmpty() && cell !in readyEat)) {
-                cells[cell.x][cell.y].color = CellColor.YELLOW
                 oneWay = checkAround(cell)
                 if (!oneWay) {
                     val goal1 = Cell(cell.x + x, cell.y + 1, CellColor.BROWN)
@@ -69,28 +70,47 @@ class Board {
 
     fun turnMade(cell: Cell) {
         if (cell.color == CellColor.RED) {
+            var delPink: Cell? = null
+            var distance: Int
+            var finalDistance = 10
             var maybeChangeTurn = true
             var changeTurn = true
+            var createQueen = false
             if ((turn == ChipColor.BLACK && cell.isUp()) || (turn == ChipColor.WHITE && cell.isDown())) {
                 cells[cell.x][cell.y].chip = Queen(turn)
-            } else {
-                cells[cell.x][cell.y].chip = Chip(turn)
+                createQueen = true
             }
             for (i in cells.indices) {
                 for (j in cells[i].indices) {
-                    if (cells[i][j].color == CellColor.YELLOW) cells[i][j].chip = null
-                    if (cells[i][j].color == CellColor.PINK) {
+                    if (cells[i][j].color == CellColor.YELLOW) {
+                        if (!createQueen) {
+                            if (cells[i][j].chip is Queen) {
+                                cells[cell.x][cell.y].chip = Queen(turn)
+                            } else {
+                                cells[cell.x][cell.y].chip = Chip(turn)
+                            }
+                        }
                         cells[i][j].chip = null
-                        maybeChangeTurn=false
+                    }
+                    if (cells[i][j].color == CellColor.PINK) {
+                        distance = cell.distance(cells[i][j])
+                        if (distance < finalDistance) {
+                            finalDistance = distance
+                            delPink = cells[i][j]
+                        }
+                        maybeChangeTurn = false
                     }
                 }
             }
-            if (!maybeChangeTurn){
+            if (delPink != null) cells[delPink.x][delPink.y].chip = null
+            if (!maybeChangeTurn) {
+                if (turn == ChipColor.WHITE) bcng--
+                else wcng--
                 makeTurn(cell)
                 for (i in cells.indices) {
                     for (j in cells[i].indices) {
                         if (cells[i][j].color == CellColor.PINK) {
-                             changeTurn = false
+                            changeTurn = false
                         }
                     }
                 }
@@ -101,7 +121,7 @@ class Board {
         listener!!.update()
     }
 
-    fun checkEat(goalN:Cell,x:Int,y:Int,oneWay:Boolean):Boolean{
+    fun checkEat(goalN: Cell, x: Int, y: Int, oneWay: Boolean): Boolean {
         if (goalN.isInside()) {
             if (cells[goalN.x][goalN.y].chip != null && cells[goalN.x][goalN.y].chip?.color != turn) {
                 val goal = Cell(goalN.x + x, goalN.y + y, CellColor.BROWN)
@@ -116,31 +136,114 @@ class Board {
         return true
     }
 
-    fun checkEatAll(){
+    fun checkEatAll() {
         readyEat.clear()
-        for (i in 0 until width){
-            for (j in 0 until height){
+        for (i in 0 until width) {
+            for (j in 0 until height) {
                 if (cells[i][j].chip != null && cells[i][j].chip?.color == turn) {
-                    val result = checkAround(cells[i][j])
-                    if (result) readyEat.add(cells[i][j])
+                    if (cells[i][j].chip !is Queen) {
+                        val result = checkAround(cells[i][j])
+                        if (result) readyEat.add(cells[i][j])
+                    } else {
+                        val result = checkAroundQueen(cells[i][j])
+                        if (result) readyEat.add(cells[i][j])
+                    }
                 }
             }
         }
         clearBoard()
     }
 
-    fun checkAround(cell:Cell):Boolean{
+    fun checkAround(cell: Cell): Boolean {
         var result = false
-        result = checkEat(Cell(cell.x + 1, cell.y + 1, CellColor.BROWN),1,1,result)
-        result = checkEat(Cell(cell.x + 1, cell.y - 1, CellColor.BROWN),1,-1,result)
-        result = checkEat(Cell(cell.x - 1, cell.y + 1, CellColor.BROWN),-1,1,result)
-        result = checkEat(Cell(cell.x - 1, cell.y - 1, CellColor.BROWN),-1,-1,result)
+        result = checkEat(Cell(cell.x + 1, cell.y + 1, CellColor.BROWN), 1, 1, result)
+        result = checkEat(Cell(cell.x + 1, cell.y - 1, CellColor.BROWN), 1, -1, result)
+        result = checkEat(Cell(cell.x - 1, cell.y + 1, CellColor.BROWN), -1, 1, result)
+        result = checkEat(Cell(cell.x - 1, cell.y - 1, CellColor.BROWN), -1, -1, result)
         return result
     }
-}
 
-fun main() {
-    val bord = Board()
-    println(bord.cells)
-    println()
+    fun makeTurnQueen(cell: Cell) {
+        clearBoard()
+        if (turn == cell.chip?.color) {
+            checkEatAll()
+            cells[cell.x][cell.y].color = CellColor.YELLOW
+            if (readyEat.isNotEmpty() && cell in readyEat) {
+                checkDiagonalEat(cell, 1, 1)
+                checkDiagonalEat(cell, 1, -1)
+                checkDiagonalEat(cell, -1, 1)
+                checkDiagonalEat(cell, -1, -1)
+            } else if (readyEat.isEmpty()) {
+                checkDiagonal(cell, 1, 1)
+                checkDiagonal(cell, 1, -1)
+                checkDiagonal(cell, -1, 1)
+                checkDiagonal(cell, -1, -1)
+            }
+        }
+        listener!!.update()
+    }
+
+    fun checkAroundQueen(cell: Cell): Boolean {
+        var result = false
+        var x = 0
+        var y = 0
+        for (i in 0 until width) {
+            x++
+            y++
+            result = checkEat(Cell(cell.x + x, cell.y + y, CellColor.BROWN), 1, 1, result)
+            result = checkEat(Cell(cell.x + x, cell.y - y, CellColor.BROWN), 1, -1, result)
+            result = checkEat(Cell(cell.x - x, cell.y + y, CellColor.BROWN), -1, 1, result)
+            result = checkEat(Cell(cell.x - x, cell.y - y, CellColor.BROWN), -1, -1, result)
+            if (result) return true
+        }
+        return false
+    }
+
+    fun checkDiagonalEat(cell: Cell, x: Int, y: Int) {
+        var CellX = 0
+        var CellY = 0
+        var xx = x
+        var yy = y
+        var maybeEat = false
+        var chipAfter = false
+        for (i in 0 until width) {
+            val newCell = Cell(cell.x + xx, cell.y + yy, CellColor.BROWN)
+            if (!newCell.isInside()) break
+            if (cells[newCell.x][newCell.y].chip != null && cells[newCell.x][newCell.y].chip?.color == turn) break
+            if (maybeEat) {
+                if (cells[newCell.x][newCell.y].chip != null) {
+                    if (chipAfter) {
+                        cells[CellX][CellY].color = CellColor.BROWN
+                    }
+                    break
+                }
+                cells[newCell.x][newCell.y].color = CellColor.RED
+                chipAfter = false
+            }
+            if (cells[newCell.x][newCell.y].chip != null && cells[newCell.x][newCell.y].chip?.color != turn) {
+                if (newCell.x != 0 && newCell.x != 7 && newCell.y != 0 && newCell.y != 7) {
+                    cells[newCell.x][newCell.y].color = CellColor.PINK
+                    maybeEat = true
+                    chipAfter = true
+                    CellX = newCell.x
+                    CellY = newCell.y
+                } else break
+            }
+            xx += x
+            yy += y
+        }
+    }
+
+    fun checkDiagonal(cell: Cell, x: Int, y: Int) {
+        var xx = x
+        var yy = y
+        for (i in 0 until width) {
+            val newCell = Cell(cell.x + xx, cell.y + yy, CellColor.BROWN)
+            if (!newCell.isInside()) break
+            if (cells[newCell.x][newCell.y].chip != null) break
+            cells[newCell.x][newCell.y].color = CellColor.RED
+            xx += x
+            yy += y
+        }
+    }
 }

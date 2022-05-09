@@ -7,7 +7,11 @@ class BasedChipListener(board: Board) : ChipListener {
     private var board: Board? = board
 
     override fun chipClicked(cell: Cell) {
-        board?.makeTurn(cell)
+        if (cell.chip is Queen) {
+            board?.makeTurnQueen(cell)
+        } else {
+            board?.makeTurn(cell)
+        }
     }
 }
 
@@ -18,5 +22,6 @@ class BasedBoardListener(board: Board) : BoardListener {
     override fun boardClicked(cell: Cell) {
         board?.turnMade(cell)
     }
+
     override fun update() {}
 }

@@ -1,6 +1,7 @@
 package org.example.checkers.javafx
 
 import javafx.scene.control.Button
+import javafx.scene.image.ImageView
 import javafx.scene.layout.BorderPane
 import javafx.scene.paint.Color
 import org.example.checkers.controller.BasedBoardListener
@@ -8,7 +9,7 @@ import org.example.checkers.controller.BasedChipListener
 import org.example.checkers.core.*
 import tornadofx.*
 
-class CheckersView: View(), BoardListener {
+class CheckersView : View(), BoardListener {
     private val board = Board()
 
     private val chipListener = BasedChipListener(board)
@@ -61,8 +62,20 @@ class CheckersView: View(), BoardListener {
                                                 CellColor.PINK -> "-fx-background-color: pink"
                                                 else -> "-fx-background-color: yellow"
                                             }
-                                            graphic = circle(radius = 20.0) {
-                                                fill = board.cells[row][column].chip?.color?.toJavaFx()
+                                            if (board.cells[row][column].chip !is Queen) {
+                                                graphic = circle(radius = 20.0) {
+                                                    fill = board.cells[row][column].chip?.color?.toJavaFx()
+                                                }
+                                            } else if (board.cells[row][column].chip?.color ==ChipColor.WHITE) {
+                                                graphic = ImageView("/img.png").apply {
+                                                    fitWidth = 70.0
+                                                    fitHeight = 70.0
+                                                }
+                                            } else {
+                                                graphic = ImageView("/img_1.png").apply {
+                                                    fitWidth = 70.0
+                                                    fitHeight = 70.0
+                                                }
                                             }
                                         }.action {
                                             chipListener.chipClicked(cell)
@@ -78,9 +91,10 @@ class CheckersView: View(), BoardListener {
     }
 }
 
-fun CellColor.toJavaFxColor():Color{
-    return Color(this.r/255.0,this.g/255.0,this.b/255.0,0.5)
+fun CellColor.toJavaFxColor(): Color {
+    return Color(this.r / 255.0, this.g / 255.0, this.b / 255.0, 0.5)
 }
-fun ChipColor.toJavaFx():Color{
-    return Color(this.r/255.0,this.g/255.0,this.b/255.0,0.5)
+
+fun ChipColor.toJavaFx(): Color {
+    return Color(this.r / 255.0, this.g / 255.0, this.b / 255.0, 0.5)
 }

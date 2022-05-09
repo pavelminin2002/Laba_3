@@ -1,6 +1,8 @@
 package org.example.checkers.core
 
-enum class CellColor(var r:Int,var g:Int,var b:Int) {
+import kotlin.math.sqrt
+
+enum class CellColor(var r: Int, var g: Int, var b: Int) {
     BROWN(160, 82, 45),
     IVORY(255, 222, 173),
     YELLOW(255, 255, 0),
@@ -16,6 +18,8 @@ class Cell(var x: Int, var y: Int, var color: CellColor) {
 
     fun isUp(): Boolean = (this.x == 7)
     fun isDown(): Boolean = (this.x == 0)
+    fun distance(other: Cell): Int =
+        sqrt(sqr((this.x - other.x)).toDouble() + sqr((this.y - other.y)).toDouble()).toInt()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -32,3 +36,5 @@ class Cell(var x: Int, var y: Int, var color: CellColor) {
     }
 
 }
+
+fun sqr(x: Int): Int = x * x
