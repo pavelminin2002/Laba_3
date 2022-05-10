@@ -1,18 +1,16 @@
 package org.example.checkers.core
 
 
-var bcn = 12
-var wcn = 12
 
 class Board {
-    private var bcng = 12
-    private var wcng = 12
+    var bcng = 0
+    var wcng = 0
     private val width = 8
     private val height = 8
-    private var turn = ChipColor.WHITE
+    var turn = ChipColor.WHITE
     var cells = mutableListOf<List<Cell>>()
     private var listener: BoardListener? = null
-    val readyEat = mutableListOf<Cell>()
+    private val readyEat = mutableListOf<Cell>()
     fun registerListener(listener: BoardListener) {
         this.listener = listener
     }
@@ -23,13 +21,13 @@ class Board {
             for (column in 0 until height) {
                 val c = if (row % 2 == column % 2) CellColor.IVORY else CellColor.BROWN
                 val cell = Cell(row, column, c)
-                if (bcn != 0 && c == CellColor.BROWN) {
+                if (bcng != 12 && c == CellColor.BROWN) {
                     cell.chip = Chip(ChipColor.BLACK)
-                    bcn--
+                    bcng++
                 }
-                if (wcn != 0 && c == CellColor.BROWN && row >= 5) {
+                if (wcng != 12 && c == CellColor.BROWN && row >= 5) {
                     cell.chip = Chip(ChipColor.WHITE)
-                    wcn--
+                    wcng++
                 }
                 list.add(cell)
             }
@@ -37,7 +35,7 @@ class Board {
         }
     }
 
-    fun clearBoard() {
+    private fun clearBoard() {
         for (i in cells.indices) {
             for (j in cells[i].indices) {
                 val c = if (i % 2 == j % 2) CellColor.IVORY else CellColor.BROWN
@@ -47,7 +45,7 @@ class Board {
     }
 
     fun makeTurn(cell: Cell) {
-        var oneWay: Boolean
+        val oneWay: Boolean
         clearBoard()
         val x = if (turn == ChipColor.WHITE) -1 else 1
         if (turn == cell.chip?.color) {
@@ -121,7 +119,7 @@ class Board {
         listener!!.update()
     }
 
-    fun checkEat(goalN: Cell, x: Int, y: Int, oneWay: Boolean): Boolean {
+    private fun checkEat(goalN: Cell, x: Int, y: Int, oneWay: Boolean): Boolean {
         if (goalN.isInside()) {
             if (cells[goalN.x][goalN.y].chip != null && cells[goalN.x][goalN.y].chip?.color != turn) {
                 val goal = Cell(goalN.x + x, goalN.y + y, CellColor.BROWN)
@@ -136,7 +134,7 @@ class Board {
         return true
     }
 
-    fun checkEatAll() {
+    private fun checkEatAll() {
         readyEat.clear()
         for (i in 0 until width) {
             for (j in 0 until height) {
@@ -154,7 +152,7 @@ class Board {
         clearBoard()
     }
 
-    fun checkAround(cell: Cell): Boolean {
+    private fun checkAround(cell: Cell): Boolean {
         var result = false
         result = checkEat(Cell(cell.x + 1, cell.y + 1, CellColor.BROWN), 1, 1, result)
         result = checkEat(Cell(cell.x + 1, cell.y - 1, CellColor.BROWN), 1, -1, result)
@@ -183,7 +181,7 @@ class Board {
         listener!!.update()
     }
 
-    fun checkAroundQueen(cell: Cell): Boolean {
+    private fun checkAroundQueen(cell: Cell): Boolean {
         var result = false
         var x = 0
         var y = 0
@@ -199,9 +197,9 @@ class Board {
         return false
     }
 
-    fun checkDiagonalEat(cell: Cell, x: Int, y: Int) {
-        var CellX = 0
-        var CellY = 0
+    private fun checkDiagonalEat(cell: Cell, x: Int, y: Int) {
+        var cellX = 0
+        var cellY = 0
         var xx = x
         var yy = y
         var maybeEat = false
@@ -213,7 +211,7 @@ class Board {
             if (maybeEat) {
                 if (cells[newCell.x][newCell.y].chip != null) {
                     if (chipAfter) {
-                        cells[CellX][CellY].color = CellColor.BROWN
+                        cells[cellX][cellY].color = CellColor.BROWN
                     }
                     break
                 }
@@ -225,8 +223,8 @@ class Board {
                     cells[newCell.x][newCell.y].color = CellColor.PINK
                     maybeEat = true
                     chipAfter = true
-                    CellX = newCell.x
-                    CellY = newCell.y
+                    cellX = newCell.x
+                    cellY = newCell.y
                 } else break
             }
             xx += x
@@ -234,7 +232,7 @@ class Board {
         }
     }
 
-    fun checkDiagonal(cell: Cell, x: Int, y: Int) {
+    private fun checkDiagonal(cell: Cell, x: Int, y: Int) {
         var xx = x
         var yy = y
         for (i in 0 until width) {
