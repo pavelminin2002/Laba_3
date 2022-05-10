@@ -1,8 +1,10 @@
 package org.example.checkers.javafx
 
 import javafx.scene.control.Button
+import javafx.scene.control.Label
 import javafx.scene.image.ImageView
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import org.example.checkers.controller.BasedBoardListener
 import org.example.checkers.controller.BasedChipListener
@@ -10,16 +12,47 @@ import org.example.checkers.core.*
 import tornadofx.*
 
 class CheckersView : View(), BoardListener {
-    private val board = Board()
-
-    private val chipListener = BasedChipListener(board)
-    private val boardListener = BasedBoardListener(board)
+    private var board = Board()
+    private var inProcess: Boolean = true
+    private var chipListener = BasedChipListener(board)
+    private var boardListener = BasedBoardListener(board)
+    private lateinit var statusLabel: Label
 
     override val root = BorderPane()
 
     init {
         title = "Shashki"
+        with(root) {
+            top {
+                vbox {
+                    menubar {
+                        menu("Game") {
+                            item("Restart").action {
+                                restart()
+                            }
+                            separator()
+                            item("Exit").action {
+                                this@CheckersView.close()
+                            }
+                        }
+                    }
+                    spacer(Priority.ALWAYS)
+                }
+            }
+            bottom {
+                statusLabel = label("")
+            }
+        }
         board.registerListener(this)
+        updateBoard()
+    }
+
+    private fun restart() {
+        board = Board()
+        boardListener = BasedBoardListener(board)
+        board.registerListener(this)
+        chipListener = BasedChipListener(board)
+        inProcess = true
         updateBoard()
     }
 
@@ -32,6 +65,18 @@ class CheckersView : View(), BoardListener {
     }
 
     private fun updateBoard() {
+        statusLabel.text = when {
+            board.wcng == 0 -> {
+                inProcess = false
+                "Blacks win! Press 'Restart' to continue"
+            }
+            board.bcng == 0 -> {
+                inProcess = false
+                "Whites win! Press 'Restart' to continue"
+            }
+            board.turn == ChipColor.WHITE -> "Game in process: whites turn"
+            else -> "Game in process: blacks turn"
+        }
         val buttons = mutableMapOf<Cell, Button>()
         with(root) {
             center {
@@ -44,41 +89,50 @@ class CheckersView : View(), BoardListener {
                                 val cell = board.cells[row][column]
                                 val button = button {
                                     style {
-                                        backgroundColor += board.cells[row][column].color.toJavaFxColor()
+                                        backgroundColor += when (board.cells[row][column].color) {
+                                            CellColor.RED -> Color.RED
+                                            CellColor.IVORY -> Color.IVORY
+                                            else -> Color.BROWN
+                                        }
+
                                         minWidth = dimension
                                         minHeight = dimension
                                     }
                                 }
                                 button.action {
-                                    boardListener.boardClicked(cell)
+                                    if (inProcess) boardListener.boardClicked(cell)
                                 }
                                 buttons[cell] = button
                                 if (board.cells[row][column].chip != null) {
                                     buttons[cell]?.apply {
                                         button {
                                             style = when (board.cells[row][column].color) {
-                                                CellColor.BROWN -> "-fx-background-color: brown"
                                                 CellColor.RED -> "-fx-background-color: red"
-                                                CellColor.PINK -> "-fx-background-color: pink"
-                                                else -> "-fx-background-color: yellow"
+                                                else -> "-fx-background-color: brown"
                                             }
                                             if (board.cells[row][column].chip !is Queen) {
-                                                graphic = circle(radius = 20.0) {
-                                                    fill = board.cells[row][column].chip?.color?.toJavaFx()
+                                                graphic = if (board.cells[row][column].chip?.color == ChipColor.BLACK)
+                                                    ImageView("/b.png").apply {
+                                                        fitWidth = 40.0
+                                                        fitHeight = 40.0
+                                                    }
+                                                else ImageView("/w.png").apply {
+                                                    fitWidth = 40.0
+                                                    fitHeight = 40.0
                                                 }
-                                            } else if (board.cells[row][column].chip?.color ==ChipColor.WHITE) {
-                                                graphic = ImageView("/img.png").apply {
-                                                    fitWidth = 70.0
-                                                    fitHeight = 70.0
+                                            } else if (board.cells[row][column].chip?.color == ChipColor.WHITE) {
+                                                graphic = ImageView("/dw.png").apply {
+                                                    fitWidth = 45.0
+                                                    fitHeight = 45.0
                                                 }
                                             } else {
-                                                graphic = ImageView("/img_1.png").apply {
-                                                    fitWidth = 70.0
-                                                    fitHeight = 70.0
+                                                graphic = ImageView("/db.png").apply {
+                                                    fitWidth = 45.0
+                                                    fitHeight = 45.0
                                                 }
                                             }
                                         }.action {
-                                            chipListener.chipClicked(cell)
+                                            if (inProcess) chipListener.chipClicked(cell)
                                         }
                                     }
                                 }
@@ -91,10 +145,3 @@ class CheckersView : View(), BoardListener {
     }
 }
 
-fun CellColor.toJavaFxColor(): Color {
-    return Color(this.r / 255.0, this.g / 255.0, this.b / 255.0, 0.5)
-}
-
-fun ChipColor.toJavaFx(): Color {
-    return Color(this.r / 255.0, this.g / 255.0, this.b / 255.0, 0.5)
-}
