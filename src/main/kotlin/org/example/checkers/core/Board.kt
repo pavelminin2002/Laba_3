@@ -1,12 +1,11 @@
 package org.example.checkers.core
 
+import org.example.checkers.controller.BoardListener
 
 
 class Board {
-    var bcng = 0
-    var wcng = 0
-    private val width = 8
-    private val height = 8
+    private var bcng = 0
+    private var wcng = 0
     var turn = ChipColor.WHITE
     var cells = mutableListOf<List<Cell>>()
     private var listener: BoardListener? = null
@@ -16,9 +15,9 @@ class Board {
     }
 
     init {
-        for (row in 0 until width) {
+        for (row in 0 until 8) {
             val list = mutableListOf<Cell>()
-            for (column in 0 until height) {
+            for (column in 0 until 8) {
                 val c = if (row % 2 == column % 2) CellColor.IVORY else CellColor.BROWN
                 val cell = Cell(row, column, c)
                 if (bcng != 12 && c == CellColor.BROWN) {
@@ -104,7 +103,8 @@ class Board {
             if (!maybeChangeTurn) {
                 if (turn == ChipColor.WHITE) bcng--
                 else wcng--
-                makeTurn(cell)
+                if (cells[cell.x][cell.y].chip is Queen) makeTurnQueen(cell)
+                else makeTurn(cell)
                 for (i in cells.indices) {
                     for (j in cells[i].indices) {
                         if (cells[i][j].color == CellColor.PINK) {
@@ -119,10 +119,13 @@ class Board {
         listener!!.update()
     }
 
-    private fun checkEat(goalN: Cell, x: Int, y: Int, oneWay: Boolean): Boolean {
+    private fun checkEat(goalN: Cell, x: Int, y: Int, oneWay: Boolean): Boolean { //есть баг у дамки, исправить
         if (goalN.isInside()) {
             if (cells[goalN.x][goalN.y].chip != null && cells[goalN.x][goalN.y].chip?.color != turn) {
                 val goal = Cell(goalN.x + x, goalN.y + y, CellColor.BROWN)
+                val goalbef = Cell(goalN.x - x, goalN.y - y, CellColor.BROWN)
+                if (cells[goalbef.x][goalbef.y].chip != null && cells[goalbef.x][goalbef.y].chip?.color !=turn)
+                    if (!oneWay) return false
                 if (goal.isInside() && cells[goal.x][goal.y].chip == null) {
                     cells[goalN.x][goalN.y].color = CellColor.PINK
                     cells[goal.x][goal.y].color = CellColor.RED
@@ -136,8 +139,8 @@ class Board {
 
     private fun checkEatAll() {
         readyEat.clear()
-        for (i in 0 until width) {
-            for (j in 0 until height) {
+        for (i in 0 until 8) {
+            for (j in 0 until 8) {
                 if (cells[i][j].chip != null && cells[i][j].chip?.color == turn) {
                     if (cells[i][j].chip !is Queen) {
                         val result = checkAround(cells[i][j])
@@ -185,7 +188,7 @@ class Board {
         var result = false
         var x = 0
         var y = 0
-        for (i in 0 until width) {
+        for (i in 0 until 8) {
             x++
             y++
             result = checkEat(Cell(cell.x + x, cell.y + y, CellColor.BROWN), 1, 1, result)
@@ -204,7 +207,7 @@ class Board {
         var yy = y
         var maybeEat = false
         var chipAfter = false
-        for (i in 0 until width) {
+        for (i in 0 until 8) {
             val newCell = Cell(cell.x + xx, cell.y + yy, CellColor.BROWN)
             if (!newCell.isInside()) break
             if (cells[newCell.x][newCell.y].chip != null && cells[newCell.x][newCell.y].chip?.color == turn) break
@@ -235,7 +238,7 @@ class Board {
     private fun checkDiagonal(cell: Cell, x: Int, y: Int) {
         var xx = x
         var yy = y
-        for (i in 0 until width) {
+        for (i in 0 until 8) {
             val newCell = Cell(cell.x + xx, cell.y + yy, CellColor.BROWN)
             if (!newCell.isInside()) break
             if (cells[newCell.x][newCell.y].chip != null) break
@@ -243,5 +246,13 @@ class Board {
             xx += x
             yy += y
         }
+    }
+
+    fun getNumberBlack():Int{
+        return bcng
+    }
+
+    fun getNumberWhite():Int{
+        return wcng
     }
 }

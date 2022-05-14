@@ -8,6 +8,7 @@ import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import org.example.checkers.controller.BasedBoardListener
 import org.example.checkers.controller.BasedChipListener
+import org.example.checkers.controller.BoardListener
 import org.example.checkers.core.*
 import tornadofx.*
 
@@ -66,11 +67,11 @@ class CheckersView : View(), BoardListener {
 
     private fun updateBoard() {
         statusLabel.text = when {
-            board.wcng == 0 -> {
+            board.getNumberWhite() == 0 -> {
                 inProcess = false
                 "Blacks win! Press 'Restart' to continue"
             }
-            board.bcng == 0 -> {
+            board.getNumberBlack() == 0 -> {
                 inProcess = false
                 "Whites win! Press 'Restart' to continue"
             }
@@ -90,6 +91,8 @@ class CheckersView : View(), BoardListener {
                                 val button = button {
                                     style {
                                         backgroundColor += when (board.cells[row][column].color) {
+                                            CellColor.PINK->Color.PINK
+                                            CellColor.YELLOW->Color.YELLOW
                                             CellColor.RED -> Color.RED
                                             CellColor.IVORY -> Color.IVORY
                                             else -> Color.BROWN
