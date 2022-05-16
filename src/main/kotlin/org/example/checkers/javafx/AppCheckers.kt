@@ -6,6 +6,7 @@ import tornadofx.App
 
 class AppCheckers : App(CheckersView::class) {
     override fun start(stage: Stage) {
+        stage.isMaximized = true
         stage.show()
         super.start(stage)
     }
