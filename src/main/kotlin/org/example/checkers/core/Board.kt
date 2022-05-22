@@ -34,7 +34,7 @@ class Board {
         }
     }
 
-    private fun clearBoard() {
+    fun clearBoard() {
         for (i in cells.indices) {
             for (j in cells[i].indices) {
                 val c = if (i % 2 == j % 2) CellColor.IVORY else CellColor.BROWN
@@ -119,12 +119,12 @@ class Board {
         listener!!.update()
     }
 
-    private fun checkEat(goalN: Cell, x: Int, y: Int, oneWay: Boolean): Boolean { //есть баг у дамки, исправить
+    fun checkEat(goalN: Cell, x: Int, y: Int, oneWay: Boolean): Boolean {
         if (goalN.isInside()) {
             if (cells[goalN.x][goalN.y].chip != null && cells[goalN.x][goalN.y].chip?.color != turn) {
                 val goal = Cell(goalN.x + x, goalN.y + y, CellColor.BROWN)
                 val goalbef = Cell(goalN.x - x, goalN.y - y, CellColor.BROWN)
-                if (cells[goalbef.x][goalbef.y].chip != null && cells[goalbef.x][goalbef.y].chip?.color !=turn)
+                if (cells[goalbef.x][goalbef.y].chip != null && cells[goalbef.x][goalbef.y].chip?.color != turn)
                     if (!oneWay) return false
                 if (goal.isInside() && cells[goal.x][goal.y].chip == null) {
                     cells[goalN.x][goalN.y].color = CellColor.PINK
@@ -155,7 +155,7 @@ class Board {
         clearBoard()
     }
 
-    private fun checkAround(cell: Cell): Boolean {
+    fun checkAround(cell: Cell): Boolean {
         var result = false
         result = checkEat(Cell(cell.x + 1, cell.y + 1, CellColor.BROWN), 1, 1, result)
         result = checkEat(Cell(cell.x + 1, cell.y - 1, CellColor.BROWN), 1, -1, result)
@@ -184,7 +184,7 @@ class Board {
         listener!!.update()
     }
 
-    private fun checkAroundQueen(cell: Cell): Boolean {
+    fun checkAroundQueen(cell: Cell): Boolean {
         var result = false
         var x = 0
         var y = 0
@@ -200,7 +200,7 @@ class Board {
         return false
     }
 
-    private fun checkDiagonalEat(cell: Cell, x: Int, y: Int) {
+    fun checkDiagonalEat(cell: Cell, x: Int, y: Int) {
         var cellX = 0
         var cellY = 0
         var xx = x
@@ -235,7 +235,7 @@ class Board {
         }
     }
 
-    private fun checkDiagonal(cell: Cell, x: Int, y: Int) {
+    fun checkDiagonal(cell: Cell, x: Int, y: Int) {
         var xx = x
         var yy = y
         for (i in 0 until 8) {
@@ -248,11 +248,11 @@ class Board {
         }
     }
 
-    fun getNumberBlack():Int{
+    fun getNumberBlack(): Int {
         return bcng
     }
 
-    fun getNumberWhite():Int{
+    fun getNumberWhite(): Int {
         return wcng
     }
 }

@@ -25,7 +25,7 @@ class Cell(var x: Int, var y: Int, var color: CellColor) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other is Cell) {
-            return other.x == this.x && other.y == this.y
+            return other.x == this.x && other.y == this.y && other.color == this.color
         }
         return false
     }
