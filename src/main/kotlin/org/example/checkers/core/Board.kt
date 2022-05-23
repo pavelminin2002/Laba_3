@@ -4,6 +4,7 @@ import org.example.checkers.controller.BoardListener
 
 
 class Board {
+    var sw = true //для тестов
     private var bcng = 0
     private var wcng = 0
     var turn = ChipColor.WHITE
@@ -62,7 +63,7 @@ class Board {
                 }
             }
         }
-        listener!!.update()
+        if (sw) listener!!.update()
     }
 
     fun turnMade(cell: Cell) {
@@ -116,7 +117,7 @@ class Board {
             if (changeTurn) turn = turn.opposite()
             clearBoard()
         }
-        listener!!.update()
+        if (sw) listener!!.update()
     }
 
     fun checkEat(goalN: Cell, x: Int, y: Int, oneWay: Boolean): Boolean {
@@ -181,7 +182,7 @@ class Board {
                 checkDiagonal(cell, -1, -1)
             }
         }
-        listener!!.update()
+        if (sw) listener!!.update()
     }
 
     fun checkAroundQueen(cell: Cell): Boolean {

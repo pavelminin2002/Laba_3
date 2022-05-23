@@ -2,7 +2,6 @@ package org.example
 
 import org.example.checkers.core.*
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.Test
 
 class Tests {
@@ -77,7 +76,7 @@ class Tests {
     fun checkEat() {
         val board = Board()
         board.turn = ChipColor.BLACK
-        assertEquals(false, board.checkEat(Cell(4, 3, CellColor.BROWN), 1, 1 , false))
+        assertEquals(false, board.checkEat(Cell(4, 3, CellColor.BROWN), 1, 1, false))
         board.cells[3][2].chip = Chip(ChipColor.WHITE)
         assertEquals(true, board.checkAroundQueen(Cell(2, 1, CellColor.BROWN)))
     }
@@ -105,7 +104,7 @@ class Tests {
     fun checkDiagonal() {
         val board = Board()
         board.turn = ChipColor.BLACK
-        board.checkDiagonal(Cell(2,1,CellColor.BROWN), 1,1)
+        board.checkDiagonal(Cell(2, 1, CellColor.BROWN), 1, 1)
         assertEquals(CellColor.RED, board.cells[3][2].color)
         assertEquals(CellColor.RED, board.cells[4][3].color)
     }
@@ -115,14 +114,62 @@ class Tests {
         val board = Board()
         board.turn = ChipColor.BLACK
         board.cells[6][5].chip = null
-        board.checkDiagonalEat(Cell(2,1,CellColor.BROWN), 1,1)
+        board.checkDiagonalEat(Cell(2, 1, CellColor.BROWN), 1, 1)
         assertEquals(CellColor.PINK, board.cells[5][4].color)
         assertEquals(CellColor.RED, board.cells[6][5].color)
         assertEquals(CellColor.BROWN, board.cells[7][6].color)
         board.cells[7][6].chip = null
-        board.checkDiagonalEat(Cell(2,1,CellColor.BROWN), 1,1)
+        board.checkDiagonalEat(Cell(2, 1, CellColor.BROWN), 1, 1)
         assertEquals(CellColor.PINK, board.cells[5][4].color)
         assertEquals(CellColor.RED, board.cells[6][5].color)
         assertEquals(CellColor.RED, board.cells[7][6].color)
+    }
+
+    @Test
+    fun makeTurn() {
+        val board = Board()
+        board.sw = false
+        board.makeTurn(board.cells[5][0])
+        assertEquals(CellColor.RED, board.cells[4][1].color)
+        board.clearBoard()
+        board.makeTurn(board.cells[5][2])
+        assertEquals(CellColor.RED, board.cells[4][1].color)
+        assertEquals(CellColor.RED, board.cells[4][3].color)
+        assertEquals(CellColor.BROWN, board.cells[6][3].color)
+        assertEquals(CellColor.BROWN, board.cells[6][1].color)
+    }
+
+    @Test
+    fun turnMade() {
+        var board = Board()
+        board.sw = false
+        board.makeTurn(board.cells[5][2])
+        board.turnMade(board.cells[4][1])
+        assertEquals(null, board.cells[5][2].chip)
+        assertEquals(ChipColor.WHITE, board.cells[4][1].chip?.color)
+
+        board = Board()
+        board.sw = false
+        board.cells[4][3].chip = Chip(ChipColor.BLACK)
+        board.cells[1][6].chip = null
+        board.makeTurn(board.cells[5][2])
+        board.turnMade(board.cells[3][4])
+        board.makeTurn(board.cells[3][4])
+        board.turnMade(board.cells[1][6])
+        assertEquals(null, board.cells[4][3].chip)
+        assertEquals(null, board.cells[2][5].chip)
+        assertEquals(ChipColor.WHITE, board.cells[1][6].chip?.color)
+    }
+
+    @Test
+    fun makeTurnQueen() {
+        val board = Board()
+        board.sw = false
+        board.cells[5][2].chip = Queen(ChipColor.WHITE)
+        board.makeTurnQueen(board.cells[5][2])
+        assertEquals(CellColor.RED, board.cells[3][0].color)
+        assertEquals(CellColor.RED, board.cells[4][1].color)
+        assertEquals(CellColor.RED, board.cells[3][4].color)
+        assertEquals(CellColor.RED, board.cells[4][3].color)
     }
 }
