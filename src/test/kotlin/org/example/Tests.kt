@@ -8,7 +8,7 @@ class Tests {
 
     //Chip tests
     @Test
-    fun chipTests() {
+    fun opposite() {
         val c: Chip
         c = Queen(ChipColor.BLACK)
         assertEquals(ChipColor.WHITE, c.color.opposite())
@@ -128,11 +128,10 @@ class Tests {
     @Test
     fun makeTurn() {
         val board = Board()
-        board.sw = false
-        board.makeTurn(board.cells[5][0])
+        board.makeTurn(board.cells[5][0], false)
         assertEquals(CellColor.RED, board.cells[4][1].color)
         board.clearBoard()
-        board.makeTurn(board.cells[5][2])
+        board.makeTurn(board.cells[5][2], false)
         assertEquals(CellColor.RED, board.cells[4][1].color)
         assertEquals(CellColor.RED, board.cells[4][3].color)
         assertEquals(CellColor.BROWN, board.cells[6][3].color)
@@ -142,20 +141,17 @@ class Tests {
     @Test
     fun turnMade() {
         var board = Board()
-        board.sw = false
-        board.makeTurn(board.cells[5][2])
-        board.turnMade(board.cells[4][1])
+        board.makeTurn(board.cells[5][2], false)
+        board.turnMade(board.cells[4][1], false)
         assertEquals(null, board.cells[5][2].chip)
         assertEquals(ChipColor.WHITE, board.cells[4][1].chip?.color)
-
         board = Board()
-        board.sw = false
         board.cells[4][3].chip = Chip(ChipColor.BLACK)
         board.cells[1][6].chip = null
-        board.makeTurn(board.cells[5][2])
-        board.turnMade(board.cells[3][4])
-        board.makeTurn(board.cells[3][4])
-        board.turnMade(board.cells[1][6])
+        board.makeTurn(board.cells[5][2], false)
+        board.turnMade(board.cells[3][4], false)
+        board.makeTurn(board.cells[3][4], false)
+        board.turnMade(board.cells[1][6], false)
         assertEquals(null, board.cells[4][3].chip)
         assertEquals(null, board.cells[2][5].chip)
         assertEquals(ChipColor.WHITE, board.cells[1][6].chip?.color)
@@ -164,9 +160,8 @@ class Tests {
     @Test
     fun makeTurnQueen() {
         val board = Board()
-        board.sw = false
         board.cells[5][2].chip = Queen(ChipColor.WHITE)
-        board.makeTurnQueen(board.cells[5][2])
+        board.makeTurnQueen(board.cells[5][2], false)
         assertEquals(CellColor.RED, board.cells[3][0].color)
         assertEquals(CellColor.RED, board.cells[4][1].color)
         assertEquals(CellColor.RED, board.cells[3][4].color)
