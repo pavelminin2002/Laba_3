@@ -8,11 +8,15 @@ class BasedBoardListener : BoardListener {
     var board = Board()
     var inProcess: Boolean = true
 
-    override fun boardClicked(cell: Cell) {
+    fun changeTurn() {
+        board.changeTurn()
+    }
+
+    fun boardClicked(cell: Cell) {
         board.turnMade(cell, inProcess)
     }
 
-    override fun chipClicked(cell: Cell) {
+    fun chipClicked(cell: Cell) {
         if (cell.chip is Queen) {
             board.makeTurnQueen(cell, inProcess)
         } else {

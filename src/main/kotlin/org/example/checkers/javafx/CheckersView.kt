@@ -20,7 +20,7 @@ class CheckersView : View(), BoardListener {
 
     init {
         title = "Shashki"
-        root.setMinSize(1535.0, 750.0)
+        root.setMinSize(1535.0, 620.0)
         with(root) {
             top {
                 vbox {
@@ -33,13 +33,19 @@ class CheckersView : View(), BoardListener {
                                 this@CheckersView.close()
                             }
                         }
-
                     }
                     spacer(Priority.ALWAYS)
                 }
             }
             bottom {
-                statusLabel = label("")
+                hbox(500.0) {
+                    statusLabel = label("")
+                    button {
+                        text = "Change turn"
+                    }.action {
+                        boardListener.changeTurn()
+                    }
+                }
             }
         }
         boardListener.board.registerListener(this)
@@ -54,10 +60,6 @@ class CheckersView : View(), BoardListener {
         updateBoard()
     }
 
-    override fun boardClicked(cell: Cell) {}
-
-    override fun chipClicked(cell: Cell) {}
-
     override fun update() {
         updateBoard()
     }
@@ -67,7 +69,7 @@ class CheckersView : View(), BoardListener {
         with(root) {
             left {
                  vbox {
-                     this.setMinSize(375.0, 750.0)
+                     this.setMinSize(375.0, 620.0)
                      for (i in 0 until 12 - boardListener.board.getNumberBlack()) {
                          button {
                              style = "-fx-background-color: brown"
@@ -81,7 +83,7 @@ class CheckersView : View(), BoardListener {
             }
             right {
                 vbox {
-                    this.setMinSize(375.0, 750.0)
+                    this.setMinSize(375.0, 620.0)
                     for (i in 0 until 12 - boardListener.board.getNumberWhite()) {
                         button {
                             style = "-fx-background-color: brown"
@@ -96,7 +98,7 @@ class CheckersView : View(), BoardListener {
             center {
                 style = "-fx-background-color: brown"
                 gridpane {
-                    val dimension = Dimension(96.0, Dimension.LinearUnits.px)
+                    val dimension = Dimension(92.0, Dimension.LinearUnits.px)
                     for (row in -4 until 4) {
                         row {
                             for (column in -4 until 4) {
@@ -129,22 +131,22 @@ class CheckersView : View(), BoardListener {
                                             if (boardListener.board.cells[pair.first][pair.second].chip !is Queen) {
                                                 graphic = if (boardListener.board.cells[pair.first][pair.second].chip?.color == ChipColor.BLACK)
                                                     ImageView("/b.png").apply {
-                                                        fitWidth = 65.0
-                                                        fitHeight = 65.0
+                                                        fitWidth = 61.0
+                                                        fitHeight = 61.0
                                                     }
                                                 else ImageView("/w.png").apply {
-                                                    fitWidth = 65.0
-                                                    fitHeight = 65.0
+                                                    fitWidth = 61.0
+                                                    fitHeight = 61.0
                                                 }
                                             } else if (boardListener.board.cells[pair.first][pair.second].chip?.color == ChipColor.WHITE) {
                                                 graphic = ImageView("/dw.png").apply {
-                                                    fitWidth = 65.0
-                                                    fitHeight = 65.0
+                                                    fitWidth = 61.0
+                                                    fitHeight = 61.0
                                                 }
                                             } else {
                                                 graphic = ImageView("/db.png").apply {
-                                                    fitWidth = 65.0
-                                                    fitHeight = 65.0
+                                                    fitWidth = 61.0
+                                                    fitHeight = 61.0
                                                 }
                                             }
                                         }.action {

@@ -34,6 +34,14 @@ class Board {
         }
     }
 
+    fun changeTurn(){
+        checkEatAll()
+        if (readyEat().isEmpty()) {
+            turn = turn.opposite()
+            listener?.update()
+        }
+    }
+
     fun clearBoard() {
         for (i in cells.indices) {
             for (j in cells[i].indices) {
@@ -248,11 +256,11 @@ class Board {
         }
     }
 
-    fun getNumberBlack(): Int {
-        return bcng
-    }
+    fun getNumberBlack(): Int = bcng
 
-    fun getNumberWhite(): Int {
-        return wcng
-    }
+
+    fun getNumberWhite(): Int = wcng
+
+
+    fun readyEat(): List<Cell> = readyEat
 }
