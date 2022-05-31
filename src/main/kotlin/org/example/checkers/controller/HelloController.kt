@@ -2,25 +2,26 @@ package org.example.checkers.controller
 
 import org.example.checkers.core.*
 
-class BasedChipListener(board: Board) : ChipListener {
 
-    private var board: Board? = board
+class BasedBoardListener : BoardListener {
 
-    override fun chipClicked(cell: Cell) {
-        if (cell.chip is Queen) {
-            board?.makeTurnQueen(cell)
-        } else {
-            board?.makeTurn(cell)
-        }
+    var board = Board()
+    var inProcess: Boolean = true
+
+    fun changeTurn() {
+        board.changeTurn()
     }
-}
 
-class BasedBoardListener(board: Board) : BoardListener {
+    fun boardClicked(cell: Cell) {
+        board.turnMade(cell, inProcess)
+    }
 
-    private var board: Board? = board
-
-    override fun boardClicked(cell: Cell) {
-        board?.turnMade(cell)
+    fun chipClicked(cell: Cell) {
+        if (cell.chip is Queen) {
+            board.makeTurnQueen(cell, inProcess)
+        } else {
+            board.makeTurn(cell, inProcess)
+        }
     }
 
     override fun update() {}

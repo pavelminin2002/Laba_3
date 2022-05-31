@@ -4,7 +4,6 @@ import org.example.checkers.controller.BoardListener
 
 
 class Board {
-    var sw = true //для тестов
     private var bcng = 0
     private var wcng = 0
     var turn = ChipColor.WHITE
@@ -35,6 +34,14 @@ class Board {
         }
     }
 
+    fun changeTurn(){
+        checkEatAll()
+        if (readyEat().isEmpty()) {
+            turn = turn.opposite()
+            listener?.update()
+        }
+    }
+
     fun clearBoard() {
         for (i in cells.indices) {
             for (j in cells[i].indices) {
@@ -44,7 +51,7 @@ class Board {
         }
     }
 
-    fun makeTurn(cell: Cell) {
+    fun makeTurn(cell: Cell, sw: Boolean) {
         val oneWay: Boolean
         clearBoard()
         val x = if (turn == ChipColor.WHITE) -1 else 1
@@ -66,7 +73,7 @@ class Board {
         if (sw) listener!!.update()
     }
 
-    fun turnMade(cell: Cell) {
+    fun turnMade(cell: Cell, sw: Boolean) {
         if (cell.color == CellColor.RED) {
             var delPink: Cell? = null
             var distance: Int
@@ -104,8 +111,8 @@ class Board {
             if (!maybeChangeTurn) {
                 if (turn == ChipColor.WHITE) bcng--
                 else wcng--
-                if (cells[cell.x][cell.y].chip is Queen) makeTurnQueen(cell)
-                else makeTurn(cell)
+                if (cells[cell.x][cell.y].chip is Queen) makeTurnQueen(cell, sw)
+                else makeTurn(cell, sw)
                 for (i in cells.indices) {
                     for (j in cells[i].indices) {
                         if (cells[i][j].color == CellColor.PINK) {
@@ -165,7 +172,7 @@ class Board {
         return result
     }
 
-    fun makeTurnQueen(cell: Cell) {
+    fun makeTurnQueen(cell: Cell, sw: Boolean) {
         clearBoard()
         if (turn == cell.chip?.color) {
             checkEatAll()
@@ -249,11 +256,11 @@ class Board {
         }
     }
 
-    fun getNumberBlack(): Int {
-        return bcng
-    }
+    fun getNumberBlack(): Int = bcng
 
-    fun getNumberWhite(): Int {
-        return wcng
-    }
+
+    fun getNumberWhite(): Int = wcng
+
+
+    fun readyEat(): List<Cell> = readyEat
 }
