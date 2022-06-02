@@ -38,7 +38,7 @@ class CheckersView : View(), BoardListener {
                 }
             }
             bottom {
-                hbox(500.0) {
+                hbox(555.0) {
                     statusLabel = label("")
                     button {
                         text = "Change turn"
