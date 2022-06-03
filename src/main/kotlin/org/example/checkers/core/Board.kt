@@ -1,6 +1,7 @@
 package org.example.checkers.core
 
 import org.example.checkers.controller.BoardListener
+import kotlin.math.sin
 
 
 class Board {
@@ -34,7 +35,7 @@ class Board {
         }
     }
 
-    fun changeTurn(){
+    fun changeTurn() {
         checkEatAll()
         if (readyEat().isEmpty()) {
             turn = turn.opposite()
@@ -165,11 +166,34 @@ class Board {
 
     fun checkAround(cell: Cell): Boolean {
         var result = false
-        result = checkEat(Cell(cell.x + 1, cell.y + 1, CellColor.BROWN), 1, 1, result)
-        result = checkEat(Cell(cell.x + 1, cell.y - 1, CellColor.BROWN), 1, -1, result)
-        result = checkEat(Cell(cell.x - 1, cell.y + 1, CellColor.BROWN), -1, 1, result)
-        result = checkEat(Cell(cell.x - 1, cell.y - 1, CellColor.BROWN), -1, -1, result)
+        for (i in 0..3) {
+            var par = chooseDirection(i)
+            result = checkEat(
+                Cell(cell.x + par.first, cell.y + par.second, CellColor.BROWN),
+                par.first,
+                par.second,
+                result
+            )
+        }
         return result
+    }
+
+    private fun chooseDirection(i: Int): Pair<Int, Int> {
+        val sings: Pair<Int, Int> = when (i) {
+            0 -> {
+                1 to 1
+            }
+            1 -> {
+                1 to -1
+            }
+            2 -> {
+                -1 to 1
+            }
+            else -> {
+                -1 to -1
+            }
+        }
+        return sings
     }
 
     fun makeTurnQueen(cell: Cell, sw: Boolean) {
@@ -178,15 +202,15 @@ class Board {
             checkEatAll()
             cells[cell.x][cell.y].color = CellColor.YELLOW
             if (readyEat.isNotEmpty() && cell in readyEat) {
-                checkDiagonalEat(cell, 1, 1)
-                checkDiagonalEat(cell, 1, -1)
-                checkDiagonalEat(cell, -1, 1)
-                checkDiagonalEat(cell, -1, -1)
+                for (i in 0..3) {
+                    var par = chooseDirection(i)
+                    checkDiagonalEat(cell, par.first, par.second)
+                }
             } else if (readyEat.isEmpty()) {
-                checkDiagonal(cell, 1, 1)
-                checkDiagonal(cell, 1, -1)
-                checkDiagonal(cell, -1, 1)
-                checkDiagonal(cell, -1, -1)
+                for (i in 0..3) {
+                    var par = chooseDirection(i)
+                    checkDiagonal(cell, par.first, par.second)
+                }
             }
         }
         if (sw) listener!!.update()
@@ -199,10 +223,19 @@ class Board {
         for (i in 0 until 8) {
             x++
             y++
-            result = checkEat(Cell(cell.x + x, cell.y + y, CellColor.BROWN), 1, 1, result)
+            for (i in 0..3) {
+                var par = chooseDirection(i)
+                result = checkEat(
+                    Cell(cell.x + x * par.first, cell.y + y * par.second, CellColor.BROWN),
+                    par.first,
+                    par.second,
+                    result
+                )
+            }
+            /*result = checkEat(Cell(cell.x + x, cell.y + y, CellColor.BROWN), 1, 1, result)
             result = checkEat(Cell(cell.x + x, cell.y - y, CellColor.BROWN), 1, -1, result)
             result = checkEat(Cell(cell.x - x, cell.y + y, CellColor.BROWN), -1, 1, result)
-            result = checkEat(Cell(cell.x - x, cell.y - y, CellColor.BROWN), -1, -1, result)
+            result = checkEat(Cell(cell.x - x, cell.y - y, CellColor.BROWN), -1, -1, result)*/
             if (result) return true
         }
         return false
