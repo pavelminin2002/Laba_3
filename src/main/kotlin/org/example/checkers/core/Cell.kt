@@ -1,14 +1,13 @@
 package org.example.checkers.core
 
 import kotlin.math.sqrt
-import javafx.scene.paint.Color
 
-enum class CellColor(var c: Color) {
-    BROWN(Color.BROWN),
-    IVORY(Color.IVORY),
-    YELLOW(Color.YELLOW),
-    RED(Color.RED),
-    PINK(Color.PINK);
+enum class CellColor {
+    BROWN,
+    IVORY,
+    YELLOW,
+    RED,
+    PINK;
 }
 
 class Cell(var x: Int, var y: Int, var color: CellColor) {

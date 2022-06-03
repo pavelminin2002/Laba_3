@@ -4,10 +4,10 @@ import org.example.checkers.controller.BoardListener
 
 
 class Board {
-    private var bcng = 0
-    private var wcng = 0
-    var turn = ChipColor.WHITE
-    var cells = mutableListOf<List<Cell>>()
+    private var bcn = 0 //BlackChipsNumber
+    private var wcn = 0 //WhiteChipsNumber
+    private var turn = ChipColor.WHITE
+    private var cells = mutableListOf<List<Cell>>()
     private var listener: BoardListener? = null
     private val readyEat = mutableListOf<Cell>()
     fun registerListener(listener: BoardListener) {
@@ -20,13 +20,13 @@ class Board {
             for (column in 0 until 8) {
                 val c = if (row % 2 == column % 2) CellColor.IVORY else CellColor.BROWN
                 val cell = Cell(row, column, c)
-                if (bcng != 12 && c == CellColor.BROWN) {
+                if (bcn != 12 && c == CellColor.BROWN) {
                     cell.chip = Chip(ChipColor.BLACK)
-                    bcng++
+                    bcn++
                 }
-                if (wcng != 12 && c == CellColor.BROWN && row >= 5) {
+                if (wcn != 12 && c == CellColor.BROWN && row >= 5) {
                     cell.chip = Chip(ChipColor.WHITE)
-                    wcng++
+                    wcn++
                 }
                 list.add(cell)
             }
@@ -34,9 +34,9 @@ class Board {
         }
     }
 
-    fun changeTurn(){
+    fun changeTurn() {
         checkEatAll()
-        if (readyEat().isEmpty()) {
+        if (readyEat.isEmpty()) {
             turn = turn.opposite()
             listener?.update()
         }
@@ -109,8 +109,8 @@ class Board {
             }
             if (delPink != null) cells[delPink.x][delPink.y].chip = null
             if (!maybeChangeTurn) {
-                if (turn == ChipColor.WHITE) bcng--
-                else wcng--
+                if (turn == ChipColor.WHITE) bcn--
+                else wcn--
                 if (cells[cell.x][cell.y].chip is Queen) makeTurnQueen(cell, sw)
                 else makeTurn(cell, sw)
                 for (i in cells.indices) {
@@ -256,11 +256,8 @@ class Board {
         }
     }
 
-    fun getNumberBlack(): Int = bcng
+    fun getNumberBlack(): Int = bcn
 
+    fun getNumberWhite(): Int = wcn
 
-    fun getNumberWhite(): Int = wcng
-
-
-    fun readyEat(): List<Cell> = readyEat
 }
