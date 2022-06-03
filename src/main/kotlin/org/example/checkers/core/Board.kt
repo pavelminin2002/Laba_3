@@ -7,8 +7,8 @@ import kotlin.math.sin
 class Board {
     private var bcn = 0 //BlackChipsNumber
     private var wcn = 0 //WhiteChipsNumber
-    private var turn = ChipColor.WHITE
-    private var cells = mutableListOf<List<Cell>>()
+    var turn = ChipColor.WHITE
+    var cells = mutableListOf<List<Cell>>()
     private var listener: BoardListener? = null
     private val readyEat = mutableListOf<Cell>()
     fun registerListener(listener: BoardListener) {
