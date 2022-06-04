@@ -232,10 +232,6 @@ class Board {
                     result
                 )
             }
-            /*result = checkEat(Cell(cell.x + x, cell.y + y, CellColor.BROWN), 1, 1, result)
-            result = checkEat(Cell(cell.x + x, cell.y - y, CellColor.BROWN), 1, -1, result)
-            result = checkEat(Cell(cell.x - x, cell.y + y, CellColor.BROWN), -1, 1, result)
-            result = checkEat(Cell(cell.x - x, cell.y - y, CellColor.BROWN), -1, -1, result)*/
             if (result) return true
         }
         return false
